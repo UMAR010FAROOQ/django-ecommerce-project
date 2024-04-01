@@ -1,0 +1,260 @@
+{% extends 'shop/base.html' %}
+
+{% block title%}| Contact Us {% endblock %}
+{% block body %} 
+
+<style>
+    .card {
+        margin-top: 2em;
+    }
+
+    button {
+        font-family: inherit;
+        font-size: 20px;
+        background: #007bff;
+        color: white;
+        padding: 0.7em 1em;
+        margin: auto;
+        padding-left: 0.9em;
+        display: flex;
+        align-items: center;
+        border: none;
+        outline: none !important;
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.2s;
+        cursor: pointer;
+        
+      }
+      
+      button #sndbtn {
+        display: block;
+        margin-left: 0.3em;
+        transition: all 0.3s ease-in-out;
+      }
+      
+      button svg {
+        display: block;
+        transform-origin: center center;
+        transition: transform 0.3s ease-in-out;
+      }
+      
+      button:hover .svg-wrapper {
+        animation: fly-1 0.6s ease-in-out infinite alternate;
+      }
+      
+      button:hover svg {
+        transform: translateX(1.2em) rotate(45deg) scale(1.1);
+      }
+      
+      button:hover span {
+        transform: translateX(5em);
+      }
+      
+      button:active {
+        transform: scale(0.95);
+        outline: 0px;
+      }
+      
+      @keyframes fly-1 {
+        from {
+          transform: translateY(0.1em);
+        }
+      
+        to {
+          transform: translateY(-0.1em);
+        }
+      }
+      
+      
+    
+</style>
+
+
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h3 id="header" class="text-center mb-4" style="height: 40px; overflow: hidden; font-weight:bold;"></h3>
+
+                    <form id="form" name="form" method="POST" action="/shop/contact/" onsubmit="return validateForm()">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" style="text-transform: capitalize;">
+                            <small id="nameError" class="form-text text-danger"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email">
+                            <small id="emailError" class="form-text text-danger"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter the phone">
+                            <small id="phoneError" class="form-text text-danger"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="5" placeholder="Enter your message"></textarea>
+                            <small id="messageError" class="form-text text-danger"></small>
+                        </div>
+                        <div class="form-group text-center">
+                           
+                            <button type="submit" onclick="clickMe()">
+                                <div class="svg-wrapper-1">
+                                  <div class="svg-wrapper">
+                                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M0 0h24v24H0z" fill="none"></path>
+                                      <path d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z" fill="currentColor"></path>
+                                    </svg>
+                                  </div>
+                                </div>
+                                <span id="sndbtn">Send</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+function validateForm() {
+  var name = document.forms["form"]["name"].value;
+  var email = document.forms["form"]["email"].value;
+  var phone = document.forms["form"]["phone"].value;
+  var message = document.forms["form"]["message"].value;
+  
+  var nameError = document.getElementById("nameError");
+  var emailError = document.getElementById("emailError");
+  var phoneError = document.getElementById("phoneError");
+  var messageError = document.getElementById("messageError");
+  
+  nameError.innerHTML = "";
+  emailError.innerHTML = "";
+  phoneError.innerHTML = "";
+  messageError.innerHTML = "";
+  
+  if (name == "") {
+    nameError.innerHTML = "Please enter your name";
+    return false;
+  }
+  
+  if (email == "") {
+    emailError.innerHTML = "Please enter your email";
+    return false;
+  }
+  
+  if (phone == "") {
+    phoneError.innerHTML = "Please enter your phone number";
+    return false;
+  }
+  
+  if (message == "") {
+    messageError.innerHTML = "Please enter your message";
+    return false;
+  }
+  return true; //return statement if all validations pass
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Get the form element
+    const form = document.getElementById("form");
+
+    // Add event listener to the form
+    form.addEventListener("keydown", function(event) {
+        // Check if the enter key was pressed
+        if (event.key === "Enter") {
+            // Prevent the default form submission behavior
+            event.preventDefault();
+
+            // Submit the form
+            form.submit();
+        }
+    });
+});
+
+
+var words = ['Hi!', 'Contact Us!', 'Send Your Queries!'];
+var currentWordIndex = 0;
+var currentLetterIndex = 0;
+var header = document.getElementById("header");
+
+function typeWord() {
+    if (currentLetterIndex < words[currentWordIndex].length) {
+        header.innerHTML += words[currentWordIndex].charAt(currentLetterIndex);
+        currentLetterIndex++;
+        setTimeout(typeWord, 100);
+    } else {
+        setTimeout(eraseWord, 1500);
+    }
+}
+
+function eraseWord() {
+    if (currentLetterIndex > 0) {
+        header.innerHTML = header.innerHTML.slice(0, -1);
+        currentLetterIndex--;
+        setTimeout(eraseWord, 50);
+    } else {
+        currentWordIndex++;
+        if (currentWordIndex >= words.length) {
+            currentWordIndex = 0;
+        }
+        setTimeout(typeWord, 500);
+    }
+}
+
+setTimeout(typeWord, 500);
+
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<!--script for sweet alert--> 
+<script>
+  function clickMe() {
+    // Perform form validation using the existing validateForm() function
+    var isFormValid = validateForm();
+  
+    // If the form is valid, show the success message
+    if (isFormValid) {
+      swal({
+        title: "Thanks!",
+        text: "We received your message!",
+        icon: "success",
+        button: "Okay",
+      }).then((value) => {
+        // This function will be executed when the "Okay" button is clicked
+        if (value) {
+          // Reset the form fields (optional)
+          document.getElementById("form").reset();
+        }
+      });
+  
+      // Prevent the form from submitting and page from reloading
+      event.preventDefault();
+    } else {
+      // If the form is not valid, show an error message or take any other action
+      // For example, you can use SweetAlert to display an error message for each field:
+      swal({
+        title: "Error!",
+        text: "Please fill in all the required fields.",
+        icon: "error",
+        button: "Okay",
+      });
+    }
+  }
+  </script>
+  
+
+
+
+  {% endblock %}
+
+  {% block js %} {% endblock %}

@@ -1,0 +1,365 @@
+{% extends 'shop/base.html' %} 
+{% block title%}| Checkout {% endblock %} 
+{% block body %}
+
+<style>
+    /* Custom CSS for the total price section */
+    .total-price-container {
+      background-color: #f8f8f8;
+      border: 1px solid #e5e5e5;
+      border-radius: 5px;
+      padding: 8px;
+      margin-top:10px;
+      display: inline-flex;
+      align-items: center;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+      font-family: Arial, sans-serif;
+    }
+  
+    .total-price-label {
+      font-weight: bold;
+      font-size: 14px;
+      color: #555;
+      margin-right: 8px;
+    }
+  
+    .total-price-value {
+      font-size: 20px;
+      font-weight:600;
+      color: #007bff;
+      letter-spacing: 1px;
+    }
+  
+    /* Add some animation to make it more interactive */
+    .total-price-container:hover {
+      transform: translateY(-2px);
+      box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+
+
+    <!--style for button-->
+    <style>
+        .card {
+            margin-top: 2em;
+        }
+
+        button {
+            font-family: inherit;
+            font-size: 20px;
+            background: #007bff;
+            color: white;
+            padding: 0.7em 1em;
+            margin: auto;
+            padding-left: 0.9em;
+            display: flex;
+            align-items: center;
+            border: none;
+            outline: none !important;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
+            
+        }
+        
+        button #sndbtn {
+            display: block;
+            margin-left: 0.3em;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        button svg {
+            display: block;
+            transform-origin: center center;
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        button:hover .svg-wrapper {
+            animation: fly-1 0.6s ease-in-out infinite alternate;
+        }
+        
+        button:hover svg {
+            transform: translateX(2.8em) rotate(45deg) scale(1.1);
+        }
+        
+        button:hover span {
+            transform: translateX(6em);
+        }
+        
+        button:active {
+            transform: scale(0.95);
+            outline: 0px;
+        }
+        
+        @keyframes fly-1 {
+            from {
+            transform: translateY(0.2em);
+            }
+        
+            to {
+            transform: translateY(-0.1em);
+            }
+        }
+    </style>
+
+  <div class="container">
+    <div class="col my-4">
+        <h2>VibeMart Checkout - Review Your Cart Items</h2>
+        <div class="my-4">
+            <ul class="list-group" id="items">
+            </ul>
+            
+            <div class="total-price-container">
+                <span class="total-price-label">Your Total:</span>
+                <span class="total-price-value" id="totalPrice">/span>
+            </div>
+
+        </div>
+    </div>
+    <div class="col my-4">
+        <h2 id="header" class="text-center mb-4" style="height: 40px; overflow: hidden; font-weight:bold;"></h2>
+        <form id="form" name="form" method="POST" action="" onsubmit="return validateForm()">
+            {% csrf_token %}
+            <input type="hidden" name="itemsJson" id="itemsJson">
+            <input type="hidden" name="amount" id="amount">
+            <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name">
+                <small id="nameError" class="form-text text-danger"></small>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email">
+                <small id="emailError" class="form-text text-danger"></small>
+            </div>
+            <div class="form-group col-md-12"form-group col-md-6"">
+                <label for="address">Address</label>
+                <input type="text" class="form-control" id="address" name="address" placeholder="Enter your address">
+                <small id="addressError" class="form-text text-danger"></small>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="city">City</label>
+                <input type="text" class="form-control" id="city" name="city" placeholder="Enter your city">
+                <small id="cityError" class="form-text text-danger"></small>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="state">State</label>
+                <input type="text" class="form-control" id="state" name="state" placeholder="Enter your state">
+                <small id="stateError" class="form-text text-danger"></small>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="zip_code">Zip code</label>
+                <input type="text" class="form-control" id="zip_code" name="zip_code" placeholder="Enter the zip code">
+                <small id="zip_codeError" class="form-text text-danger"></small>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="phone">Phone</label>
+                <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter the phone">
+                <small id="phoneError" class="form-text text-danger"></small>
+            </div>
+            
+            <!--
+            <div class="form-group col-md-12 text-center">
+                <button type="submit" class="btn btn-primary col-6 mx-auto my-3"><i class="fas fa-paper-plane mr-2"></i>Checkout</button>
+            </div> 
+            -->
+
+            <div class="form-group text-center col-6 mx-auto my-3">
+                <button type="submit" onclick="clickMe()" >
+                    <div class="svg-wrapper-1">
+                      <div class="svg-wrapper">
+                        <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M0 0h24v24H0z" fill="none"></path>
+                          <path d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z" fill="currentColor"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <span id="sndbtn">Checkout</span>
+                </button>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+
+    //for iteration
+    var words = ['Hi!', 'Enter Your Name!', 'Enter Your Address!','Enter Your Details!'];
+    var currentWordIndex = 0;
+    var currentLetterIndex = 0;
+    var header = document.getElementById("header");
+    
+    function typeWord() {
+        if (currentLetterIndex < words[currentWordIndex].length) {
+            header.innerHTML += words[currentWordIndex].charAt(currentLetterIndex);
+            currentLetterIndex++;
+            setTimeout(typeWord, 100);
+        } else {
+            setTimeout(eraseWord, 1500);
+        }
+    }
+    
+    function eraseWord() {
+        if (currentLetterIndex > 0) {
+            header.innerHTML = header.innerHTML.slice(0, -1);
+            currentLetterIndex--;
+            setTimeout(eraseWord, 50);
+        } else {
+            currentWordIndex++;
+            if (currentWordIndex >= words.length) {
+                currentWordIndex = 0;
+            }
+            setTimeout(typeWord, 500);
+        }
+    }
+    
+    setTimeout(typeWord, 500);
+
+
+    //check validation & for sweet alert message
+        function clickMe() {
+          // Perform form validation using the existing validateForm() function
+          var isFormValid = validateForm();
+        
+          // If the form is not valid, show an error message using SweetAlert
+          if (!isFormValid) {
+            swal({
+              title: "Error!",
+              text: "Please fill in all the required fields.",
+              icon: "error",
+              button: "Okay",
+            });
+        
+            // Prevent the form from submitting and page from reloading
+            event.preventDefault();
+          }
+        }
+        
+
+    //for validateFormat
+    function validateForm() {
+        var name = document.forms["form"]["name"].value;
+        var email = document.forms["form"]["email"].value;
+        var address = document.forms["form"]["address"].value;
+        var city = document.forms["form"]["city"].value;
+        var state = document.forms["form"]["state"].value;
+        var zip_code = document.forms["form"]["zip_code"].value;
+        var phone = document.forms["form"]["phone"].value;
+      
+        var nameError = document.getElementById("nameError");
+        var emailError = document.getElementById("emailError");
+        var addressError = document.getElementById("addressError");
+        var cityError = document.getElementById("cityError");
+        var stateError = document.getElementById("stateError");
+        var zip_codeError = document.getElementById("zip_codeError");
+        var phoneError = document.getElementById("phoneError");
+      
+        nameError.innerHTML = "";
+        emailError.innerHTML = "";
+        addressError.innerHTML = "";
+        cityError.innerHTML = "";
+        stateError.innerHTML = "";
+        zip_codeError.innerHTML = "";
+        phoneError.innerHTML = "";
+      
+        if (name.trim() === "") {
+          nameError.innerHTML = "Please enter your name";
+          return false;
+        }
+      
+        if (email.trim() === "") {
+          emailError.innerHTML = "Please enter your email";
+          return false;
+        }
+
+        if (address.trim() === "") {
+          addressError.innerHTML = "Please enter your address";
+          return false;
+        }
+
+        if (city.trim() === "") {
+          cityError.innerHTML = "Please enter your city";
+          return false;
+        }
+
+        if (state.trim() === "") {
+          stateError.innerHTML = "Please enter your state";
+          return false;
+        }
+        
+        if (zip_code.trim() === "") {
+          zip_codeError.innerHTML = "Please enter your zip code";
+          return false;
+        }
+
+        if (phone.trim() === "") {
+          phoneError.innerHTML = "Please enter your phone number";
+          return false;
+        }
+      
+        return true; //return statement if all validations pass
+      }
+      
+
+
+
+
+    
+if (localStorage.getItem('cart') == null) {
+    var cart = {};
+} else {
+    cart = JSON.parse(localStorage.getItem('cart'));
+}
+console.log(cart);
+var sum = 0;
+var totalPrice = 0;
+if ($.isEmptyObject(cart)) {
+    //if object is empty
+    mystr = `<p>Your cart is empty, please add some items to your cart before checking out!</p>`
+    $('#items').append(mystr);
+} else {
+    for (item in cart) {
+        let qty = cart[item][0];
+        let name = cart[item][1];
+        let itemPrice = cart[item][2];
+        sum = sum + qty;
+        totalPrice = totalPrice + qty*itemPrice
+        mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${name}
+                    <span class="badge badge-primary badge-pill">${qty}</span>
+                </li>`
+        $('#items').append(mystr);
+    }
+}
+
+//for json 
+document.getElementById('cart').innerHTML = sum;
+document.getElementById('totalPrice').innerHTML = totalPrice;
+$('#itemsJson').val(JSON.stringify(cart));
+
+
+{% if thank %}
+swal({
+  title: "Thanks!",
+  text: "You order id: " +{{id}},
+  icon: "success",
+  button: "Okay",
+  timer: 50000, // Duration in milliseconds (5 seconds in this case)
+}).then((value) => {
+  // This function will be executed when the "Aww yiss!" button is clicked
+  if (value) {
+    // Clear the local storage (optional)
+    localStorage.clear();
+    // Redirect to the tracker page
+    document.location = "/shop/tracker";
+  }
+});
+{% endif %}
+$('#amount').val($('#totalPrice').html())
+</script>
+    
+{% endblock %}
